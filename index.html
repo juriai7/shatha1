@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JURI — The Intelligence Issue</title>
+<meta name="description" content="Juri Almarwani — Artificial Intelligence student. Computer Vision, Machine Learning & Robotics, set like a magazine." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&family=Pinyon+Script&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3EEE4;        /* warm ivory */
+    --paper-2:#ECE2D2;      /* beige */
+    --taupe:#C3AF93;
+    --taupe-deep:#A4906E;
+    --blush:#E0B2AC;        /* dusty rose — accent */
+    --blush-soft:#EFD8D3;
+    --ink:#211E19;          /* warm near-black */
+    --ink-soft:#5A5247;
+    --line:#211E19;
+    --maxw:1280px;
+    --pad:clamp(20px,5vw,68px);
+    --ff-display:"Playfair Display",serif;
+    --ff-serif:"Cormorant Garamond",serif;
+    --ff-script:"Pinyon Script",cursive;
+    --ff-hand:"Caveat",cursive;
+    --ff-ut:"Inter",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--ff-ut);font-weight:400;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    cursor:none;
+  }
+  /* faint paper grain */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:9990;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+
+  /* ---------- custom cursor ---------- */
+  .cur,.cur-dot{position:fixed;top:0;left:0;z-index:10000;pointer-events:none;border-radius:50%;mix-blend-mode:multiply;}
+  .cur{width:30px;height:30px;border:1px solid var(--ink);margin:-15px 0 0 -15px;transition:width .25s,height .25s,margin .25s,background .25s,border-color .25s;}
+  .cur-dot{width:5px;height:5px;background:var(--blush);margin:-2.5px 0 0 -2.5px;}
+  .cur.grow{width:64px;height:64px;margin:-32px 0 0 -32px;background:var(--blush-soft);border-color:transparent;}
+  @media (hover:none),(pointer:coarse){body{cursor:auto;}.cur,.cur-dot{display:none;}}
+
+  /* ---------- masthead folio ---------- */
+  .folio{
+    position:fixed;top:0;left:0;right:0;z-index:9000;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+    padding:14px var(--pad);
+    font-family:var(--ff-ut);font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;
+    border-bottom:1px solid var(--line);
+    background:color-mix(in srgb,var(--paper) 86%,transparent);
+    backdrop-filter:blur(6px);
+    transition:transform .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .folio .f-mid{font-family:var(--ff-display);font-style:italic;font-size:13px;letter-spacing:.04em;text-transform:none;}
+  .folio.up{transform:translateY(-110%);}
+  .folio .f-right{display:flex;gap:18px;}
+  .folio a.f-link{position:relative;}
+  .folio a.f-link::after{content:"";position:absolute;left:0;right:100%;bottom:-3px;height:1px;background:var(--ink);transition:right .3s;}
+  .folio a.f-link:hover::after{right:0;}
+  @media(max-width:720px){.folio .f-mid{display:none;} .folio{font-size:9px;letter-spacing:.14em;}}
+
+  /* ---------- shared layout ---------- */
+  .spread{position:relative;padding:clamp(70px,11vh,140px) var(--pad);max-width:var(--maxw);margin:0 auto;}
+  .rule{border:0;border-top:1px solid var(--line);max-width:var(--maxw);margin:0 auto;}
+  .eyebrow{font-family:var(--ff-ut);font-size:11px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-soft);}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1);}
+  .reveal.in{opacity:1;transform:none;}
+  .d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}.d5{transition-delay:.4s}
+
+  /* ---------- COVER ---------- */
+  .cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:120px var(--pad) 60px;max-width:var(--maxw);margin:0 auto;position:relative;}
+  .cover-lines{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;}
+  .cover-hand{font-family:var(--ff-hand);font-size:clamp(20px,2.6vw,30px);color:var(--ink);transform:rotate(-3deg);margin:18px 0 -6px 4px;font-weight:600;}
+  .cover-title{position:relative;line-height:.82;margin:8px 0;}
+  .cover-title .big{font-family:var(--ff-display);font-weight:900;font-size:clamp(74px,20vw,290px);letter-spacing:-.02em;}
+  .cover-title .script{font-family:var(--ff-script);font-weight:400;font-size:clamp(46px,11vw,150px);color:var(--taupe-deep);
+    display:block;margin-top:clamp(-18px,-2vw,-30px);margin-left:clamp(8px,8vw,120px);line-height:1;}
+  .cover-sub{display:flex;flex-wrap:wrap;justify-content:space-between;gap:24px;margin-top:26px;align-items:flex-end;}
+  .cover-sub .lead{font-family:var(--ff-serif);font-style:italic;font-size:clamp(20px,2.4vw,30px);max-width:30ch;line-height:1.35;color:var(--ink);}
+  .cover-sub .meta{font-size:11px;letter-spacing:.24em;text-transform:uppercase;text-align:right;color:var(--ink-soft);line-height:2;font-weight:500;}
+  /* collage discs */
+  .disc{position:absolute;border-radius:50%;z-index:-1;}
+  .cover .d-a{width:clamp(120px,18vw,260px);height:clamp(120px,18vw,260px);background:var(--taupe);top:8%;right:6%;}
+  .cover .d-b{width:clamp(80px,11vw,150px);height:clamp(80px,11vw,150px);background:var(--blush);top:30%;right:24%;mix-blend-mode:multiply;}
+  .cover .d-c{width:clamp(60px,8vw,110px);height:clamp(60px,8vw,110px);border:1px solid var(--ink);bottom:18%;left:2%;}
+  .scrolldown{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .scrolldown .ln{width:1px;height:34px;background:var(--ink-soft);animation:drip 2.2s ease-in-out infinite;transform-origin:top;}
+  @keyframes drip{0%,100%{transform:scaleY(.3);opacity:.3}50%{transform:scaleY(1);opacity:1}}
+
+  /* letter rise on load */
+  .rise{display:inline-block;transform:translateY(106%);}
+  .rise-wrap{overflow:hidden;display:inline-block;vertical-align:bottom;}
+  .loaded .rise{animation:rise 1s cubic-bezier(.2,.8,.2,1) forwards;}
+  .loaded .rise.r2{animation-delay:.09s}.loaded .rise.r3{animation-delay:.18s}.loaded .rise.r4{animation-delay:.27s}
+  @keyframes rise{to{transform:none;}}
+  .fadeup{opacity:0;transform:translateY(16px);}
+  .loaded .fadeup{animation:fadeup .9s ease forwards;}
+  .loaded .fadeup.fd1{animation-delay:.5s}.loaded .fadeup.fd2{animation-delay:.66s}.loaded .fadeup.fd3{animation-delay:.8s}
+  @keyframes fadeup{to{opacity:1;transform:none;}}
+
+  /* ---------- ticker ---------- */
+  .ticker{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--ink);color:var(--paper);overflow:hidden;white-space:nowrap;}
+  .ticker .track{display:inline-block;padding:13px 0;animation:scrollx 32s linear infinite;font-family:var(--ff-display);font-style:italic;font-size:clamp(15px,2vw,22px);}
+  .ticker .track span{margin:0 26px;}
+  .ticker .track span::after{content:"✦";margin-left:52px;color:var(--blush);font-style:normal;}
+  @keyframes scrollx{to{transform:translateX(-50%);}}
+
+  /* ---------- section heading device ---------- */
+  .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:46px;}
+  .sec-head .title{position:relative;line-height:.9;}
+  .sec-head .script{font-family:var(--ff-script);font-size:clamp(36px,6vw,78px);color:var(--taupe-deep);display:block;line-height:.7;margin-left:6px;}
+  .sec-head .word{font-family:var(--ff-display);font-weight:800;font-size:clamp(40px,8vw,104px);letter-spacing:-.02em;text-transform:uppercase;}
+  .sec-no{font-family:var(--ff-display);font-style:italic;font-size:clamp(40px,7vw,90px);color:var(--blush);}
+
+  /* ---------- ABOUT / editor letter ---------- */
+  .about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,5vw,72px);align-items:start;}
+  .about-grid .drop::first-letter{font-family:var(--ff-display);font-weight:800;font-size:5.4em;float:left;line-height:.66;margin:8px 12px 0 0;color:var(--ink);}
+  .about-grid p{font-family:var(--ff-serif);font-size:clamp(17px,1.5vw,21px);line-height:1.6;color:var(--ink);margin:0 0 20px;}
+  .about-grid .sign{font-family:var(--ff-script);font-size:38px;color:var(--ink);margin-top:8px;}
+  .photo-slot{position:relative;border:1px solid var(--line);aspect-ratio:3/4;background:
+    repeating-linear-gradient(135deg,transparent 0 14px,rgba(33,30,25,.05) 14px 15px),var(--paper-2);
+    display:flex;align-items:center;justify-content:center;text-align:center;}
+  .photo-slot::after{content:"YOUR PORTRAIT";position:absolute;font-size:10px;letter-spacing:.3em;color:var(--ink-soft);}
+  .photo-slot.round{border-radius:50%;aspect-ratio:1;}
+  .annot{font-family:var(--ff-hand);font-size:21px;font-weight:600;color:var(--ink);transform:rotate(-4deg);display:inline-block;}
+
+  /* timeline / epochs */
+  .epochs{margin-top:56px;border-top:1px solid var(--line);}
+  .epoch{display:grid;grid-template-columns:90px 1fr 1fr;gap:24px;padding:26px 0;border-bottom:1px solid var(--line);align-items:baseline;}
+  .epoch .ep-no{font-family:var(--ff-display);font-style:italic;font-size:22px;color:var(--blush);}
+  .epoch .ep-t{font-family:var(--ff-display);font-weight:700;font-size:clamp(20px,2.4vw,30px);}
+  .epoch .ep-d{font-family:var(--ff-serif);font-size:18px;line-height:1.5;color:var(--ink-soft);}
+  .epoch:hover{background:var(--blush-soft);}
+  @media(max-width:760px){.epoch{grid-template-columns:54px 1fr;}.epoch .ep-d{grid-column:1/-1;}}
+
+  /* ---------- CONTENTS index ---------- */
+  .contents{display:grid;grid-template-columns:1fr 1fr;gap:0 clamp(30px,5vw,70px);}
+  .toc-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:18px 0;border-bottom:1px solid var(--line);}
+  .toc-row .t-name{font-family:var(--ff-display);font-size:clamp(18px,2vw,24px);font-weight:600;}
+  .toc-row .t-dot{flex:1;border-bottom:1px dotted var(--ink-soft);margin:0 6px 5px;}
+  .toc-row .t-pg{font-family:var(--ff-serif);font-style:italic;font-size:20px;color:var(--ink-soft);}
+  @media(max-width:760px){.contents{grid-template-columns:1fr;}}
+
+  /* ---------- FEATURES ---------- */
+  .feature{padding:clamp(54px,8vh,96px) 0;border-bottom:1px solid var(--line);}
+  .feat-top{display:flex;justify-content:space-between;gap:20px;align-items:baseline;flex-wrap:wrap;}
+  .feat-kicker{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--blush);font-weight:600;}
+  .feat-title{font-family:var(--ff-display);font-weight:800;font-size:clamp(34px,6vw,82px);line-height:.96;letter-spacing:-.015em;margin:14px 0 4px;}
+  .feat-title em{font-family:var(--ff-script);font-weight:400;font-style:normal;color:var(--taupe-deep);font-size:1.05em;letter-spacing:0;}
+  .feat-deck{font-family:var(--ff-serif);font-style:italic;font-size:clamp(19px,2vw,26px);color:var(--ink-soft);max-width:46ch;line-height:1.4;margin-top:10px;}
+  .feat-body{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,64px);margin-top:42px;align-items:start;}
+  .feat-fig{position:relative;}
+  .feat-fig .photo-slot{aspect-ratio:4/3;}
+  .feat-fig figcaption{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-top:10px;}
+  .feat-cols{columns:1;}
+  .feat-block{margin-bottom:24px;}
+  .feat-block h4{font-family:var(--ff-ut);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink);margin:0 0 7px;font-weight:600;}
+  .feat-block p{font-family:var(--ff-serif);font-size:18px;line-height:1.55;margin:0;color:var(--ink);}
+  .stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+  .chip{font-family:var(--ff-ut);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);padding:6px 12px;border-radius:30px;}
+  .feat-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:30px;flex-wrap:wrap;}
+  .ghlink{font-family:var(--ff-ut);font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:500;border-bottom:1px solid var(--ink);padding-bottom:3px;}
+  .ghlink:hover{color:var(--taupe-deep);border-color:var(--taupe-deep);}
+  .feat-lesson{font-family:var(--ff-hand);font-size:22px;font-weight:600;color:var(--ink);transform:rotate(-2deg);}
+  @media(max-width:820px){.feat-body{grid-template-columns:1fr;}}
+
+  /* ---------- SKILLS index / contact sheet ---------- */
+  .skills-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);}
+  .skill-cell{padding:26px 22px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:210px;display:flex;flex-direction:column;justify-content:space-between;transition:background .35s;}
+  .skill-cell:hover{background:var(--ink);color:var(--paper);}
+  .skill-cell:hover .sc-list li{color:var(--paper);}
+  .skill-cell .sc-no{font-family:var(--ff-display);font-style:italic;font-size:20px;color:var(--blush);}
+  .skill-cell .sc-cat{font-family:var(--ff-display);font-weight:700;font-size:clamp(20px,2vw,27px);line-height:1.05;margin-top:auto;}
+  .sc-list{list-style:none;padding:0;margin:14px 0 0;}
+  .sc-list li{font-family:var(--ff-serif);font-size:16.5px;line-height:1.5;color:var(--ink-soft);}
+  @media(max-width:980px){.skills-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:520px){.skills-grid{grid-template-columns:1fr;}}
+
+  /* ---------- ACHIEVEMENTS clippings ---------- */
+  .clips{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(16px,2.4vw,30px);}
+  .clip{border:1px solid var(--line);padding:24px 22px;background:var(--paper);position:relative;}
+  .clip:nth-child(1){grid-column:span 7;}
+  .clip:nth-child(2){grid-column:span 5;background:var(--blush-soft);}
+  .clip:nth-child(3){grid-column:span 5;}
+  .clip:nth-child(4){grid-column:span 7;background:var(--paper-2);}
+  .clip .c-year{font-family:var(--ff-display);font-style:italic;font-size:18px;color:var(--taupe-deep);}
+  .clip h3{font-family:var(--ff-display);font-weight:700;font-size:clamp(22px,2.6vw,34px);margin:8px 0 8px;line-height:1.05;}
+  .clip p{font-family:var(--ff-serif);font-size:17px;line-height:1.5;color:var(--ink-soft);margin:0;}
+  .clip .tape{position:absolute;top:-11px;left:50%;transform:translateX(-50%) rotate(-3deg);width:88px;height:22px;background:rgba(224,178,172,.55);}
+  @media(max-width:760px){.clip,.clip:nth-child(n){grid-column:1/-1 !important;}}
+
+  /* ---------- EXPLORING ---------- */
+  .radar{display:flex;flex-wrap:wrap;gap:14px;}
+  .radar .r-item{font-family:var(--ff-display);font-weight:600;font-size:clamp(22px,3.4vw,48px);padding:6px 4px;border-bottom:1px solid var(--line);transition:color .3s,padding-left .3s;}
+  .radar .r-item:hover{color:var(--blush);padding-left:14px;}
+  .radar .r-item .r-tag{font-family:var(--ff-ut);font-size:11px;letter-spacing:.2em;vertical-align:super;color:var(--ink-soft);margin-left:8px;}
+
+  /* ---------- CONTACT / wrap ---------- */
+  .wrap{background:var(--ink);color:var(--paper);}
+  .wrap .spread{padding-top:clamp(80px,12vh,160px);padding-bottom:clamp(60px,10vh,120px);}
+  .wrap .eyebrow{color:var(--blush);}
+  .wrap-title{font-family:var(--ff-display);font-weight:800;font-size:clamp(54px,15vw,200px);line-height:.86;letter-spacing:-.02em;margin:10px 0;}
+  .wrap-title em{font-family:var(--ff-script);font-style:normal;font-weight:400;color:var(--blush);font-size:1.04em;}
+  .wrap-sub{font-family:var(--ff-serif);font-style:italic;font-size:clamp(20px,2.4vw,32px);color:var(--paper);opacity:.85;max-width:40ch;line-height:1.4;margin-top:18px;}
+  .wrap-links{display:flex;flex-wrap:wrap;gap:14px 40px;margin-top:50px;}
+  .wrap-links a{font-family:var(--ff-display);font-size:clamp(22px,3vw,40px);font-weight:600;position:relative;}
+  .wrap-links a::after{content:"↗";font-size:.5em;vertical-align:super;margin-left:6px;color:var(--blush);}
+  .wrap-links a:hover{color:var(--blush);}
+  .colophon{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:80px;padding-top:18px;border-top:1px solid rgba(243,238,228,.3);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.7;}
+
+  .marg-note{font-family:var(--ff-hand);font-size:20px;font-weight:600;color:var(--taupe-deep);transform:rotate(-3deg);display:inline-block;margin:6px 0;}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+    .reveal{opacity:1;transform:none;}.rise{transform:none;}.fadeup{opacity:1;transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-dot" id="curDot"></div>
+
+<!-- ===== MASTHEAD FOLIO ===== -->
+<header class="folio" id="folio">
+  <div class="f-left">№01 — Contents</div>
+  <div class="f-mid">Juri — The Intelligence Issue</div>
+  <nav class="f-right">
+    <a href="#about" class="f-link">About</a>
+    <a href="#work" class="f-link">Work</a>
+    <a href="#skills" class="f-link">Skills</a>
+    <a href="#contact" class="f-link">Contact</a>
+  </nav>
+</header>
+
+<!-- ===== COVER ===== -->
+<section class="cover" id="cover">
+  <div class="cover-lines">
+    <span>Vol. I · Computer Vision · Robotics</span>
+    <span>Riyadh ⟶ Madinah · KSA</span>
+  </div>
+
+  <div class="cover-hand fadeup fd1">Hi. Since you're here, let me show you how I think →</div>
+
+  <h1 class="cover-title">
+    <span class="big">
+      <span class="rise-wrap"><span class="rise">J</span></span><span class="rise-wrap"><span class="rise r2">U</span></span><span class="rise-wrap"><span class="rise r3">R</span></span><span class="rise-wrap"><span class="rise r4">I</span></span>
+    </span>
+    <span class="script fadeup fd2">almarwani</span>
+  </h1>
+
+  <div class="cover-sub">
+    <p class="lead fadeup fd2">Artificial Intelligence student teaching machines to see — set, like a magazine, between intelligence&nbsp;and&nbsp;intention.</p>
+    <div class="meta fadeup fd3">
+      The Intelligence Issue<br>
+      Featuring · CV · ML · Robotics<br>
+      Scroll to read ↓
+    </div>
+  </div>
+
+  <span class="disc d-a"></span>
+  <span class="disc d-b"></span>
+  <span class="disc d-c"></span>
+
+  <div class="scrolldown"><span>Begin</span><span class="ln"></span></div>
+</section>
+
+<!-- ===== TICKER ===== -->
+<div class="ticker" aria-hidden="true">
+  <div class="track">
+    <span>Computer Vision</span><span>PyTorch</span><span>OpenCV</span><span>Deep Learning</span><span>Robotics &amp; ROS</span><span>Machine Learning</span><span>Python</span><span>Real-World AI</span>
+    <span>Computer Vision</span><span>PyTorch</span><span>OpenCV</span><span>Deep Learning</span><span>Robotics &amp; ROS</span><span>Machine Learning</span><span>Python</span><span>Real-World AI</span>
+  </div>
+</div>
+
+<!-- ===== ABOUT / EDITOR'S LETTER ===== -->
+<section class="spread" id="about">
+  <div class="sec-head reveal">
+    <div class="title">
+      <span class="script">from the desk of</span>
+      <span class="word">The Editor</span>
+    </div>
+    <span class="sec-no">02</span>
+  </div>
+
+  <div class="about-grid">
+    <div class="reveal d1">
+      <p class="drop">I never set out to be only an engineer. I was the kid who took the toy apart to see how it decided to move — then spent twice as long arranging the pieces so they looked beautiful on the floor. That double instinct never left: understand the machine, and make the encounter with it feel like something.</p>
+      <p>Today I study Artificial Intelligence at the University of Prince Mugrin. My work lives in computer vision, machine learning and robotics — but I treat each project the way an editor treats an issue. There is a thesis, a point of view, and a reader I owe a clear, elegant experience.</p>
+      <p>I'm drawn to the problems where perception meets the physical world: a camera that understands a scene, a model that learns a pattern, a robot that acts on both. I want to build systems that are technically rigorous and genuinely thoughtful about the people who meet them.</p>
+      <span class="annot">— and yes, the README always matches the model.</span>
+      <div class="sign">Juri</div>
+    </div>
+
+    <div class="reveal d2" style="display:flex;flex-direction:column;gap:18px;">
+      <div class="photo-slot"></div>
+      <span class="marg-note">drop a film-grain portrait here ↑</span>
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <div class="photo-slot round" style="flex:1;"></div>
+        <p style="font-family:var(--ff-serif);font-size:16px;line-height:1.5;color:var(--ink-soft);margin:0;flex:1;">University of Prince Mugrin · Saudi Arabia. Building toward AI that reasons about the visual, physical world.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey as training epochs -->
+  <div class="epochs reveal d2">
+    <div class="epoch">
+      <span class="ep-no">Ep. 00</span>
+      <span class="ep-t">Curiosity, uncompiled</span>
+      <span class="ep-d">A child who wanted to know how things decided to move — and how to make them lovely while they did it.</span>
+    </div>
+    <div class="epoch">
+      <span class="ep-no">Ep. 01</span>
+      <span class="ep-t">Discovering intelligence</span>
+      <span class="ep-d">First lines of Python, first model that learned. The moment a machine recognised something felt like magic with maths underneath.</span>
+    </div>
+    <div class="epoch">
+      <span class="ep-no">Ep. 02</span>
+      <span class="ep-t">University of Prince Mugrin</span>
+      <span class="ep-d">Formal study in AI. Computer vision, deep learning and robotics move from tutorials to real, owned projects.</span>
+    </div>
+    <div class="epoch">
+      <span class="ep-no">Ep. 03</span>
+      <span class="ep-t">Building in the open</span>
+      <span class="ep-d">Shipping work to GitHub — perception models, ML experiments, robotics and software, documented to be read.</span>
+    </div>
+    <div class="epoch">
+      <span class="ep-no">Ep. 04</span>
+      <span class="ep-t">Loss still decreasing</span>
+      <span class="ep-d">Toward AI systems that see, reason and act in the physical world — and a body of work people remember.</span>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ===== CONTENTS / SELECTED WORK INDEX ===== -->
+<section class="spread" id="work">
+  <div class="sec-head reveal">
+    <div class="title">
+      <span class="script">in this issue</span>
+      <span class="word">Selected Work</span>
+    </div>
+    <span class="sec-no">03</span>
+  </div>
+
+  <div class="contents reveal d1">
+    <a class="toc-row" href="#feat-1"><span class="t-name">Teaching Machines to See</span><span class="t-dot"></span><span class="t-pg">Computer Vision</span></a>
+    <a class="toc-row" href="#feat-2"><span class="t-name">Patterns, Learned</span><span class="t-dot"></span><span class="t-pg">Machine Learning</span></a>
+    <a class="toc-row" href="#feat-3"><span class="t-name">Bodies That Decide</span><span class="t-dot"></span><span class="t-pg">Robotics</span></a>
+    <a class="toc-row" href="#feat-4"><span class="t-name">The Software Underneath</span><span class="t-dot"></span><span class="t-pg">Engineering</span></a>
+  </div>
+  <p class="marg-note reveal d2" style="margin-top:22px;">7 repositories &amp; counting — swap these features for your own ↓</p>
+</section>
+
+<!-- FEATURE 1 -->
+<article class="spread feature reveal" id="feat-1" style="border-top:1px solid var(--line);">
+  <div class="feat-top">
+    <div>
+      <div class="feat-kicker">Feature 01 — Computer Vision</div>
+      <h2 class="feat-title">Teaching Machines<br><em>to see</em></h2>
+      <p class="feat-deck">A perception system that turns raw pixels into understanding — detection, recognition, and the quiet judgment a model needs before it can act.</p>
+    </div>
+  </div>
+  <div class="feat-body">
+    <figure class="feat-fig">
+      <div class="photo-slot"></div>
+      <figcaption>Fig. 1 — model output / detection overlay. Drop a result frame here.</figcaption>
+    </figure>
+    <div class="feat-cols">
+      <div class="feat-block"><h4>The problem</h4><p>Give a machine a camera and it sees noise. The work is teaching it to find structure — the object, the boundary, the thing that matters — reliably enough to be trusted.</p></div>
+      <div class="feat-block"><h4>Approach &amp; process</h4><p>Data curated and labelled, a convolutional model trained and tuned, results evaluated against honest metrics rather than flattering ones. Iterated until the failure cases got interesting instead of embarrassing.</p></div>
+      <div class="feat-block"><h4>Stack</h4>
+        <div class="stack"><span class="chip">Python</span><span class="chip">PyTorch</span><span class="chip">OpenCV</span><span class="chip">NumPy</span></div>
+      </div>
+      <div class="feat-block"><h4>Outcome</h4><p>A working vision pipeline from input to inference — documented end to end so the next reader can run it, not just admire it.</p></div>
+    </div>
+  </div>
+  <div class="feat-foot">
+    <span class="feat-lesson">Lesson — the model is only as honest as its hardest test set.</span>
+    <a class="ghlink" href="https://github.com/juriai7?tab=repositories" target="_blank" rel="noopener">Read the code on GitHub →</a>
+  </div>
+</article>
+
+<!-- FEATURE 2 -->
+<article class="spread feature reveal" id="feat-2">
+  <div class="feat-top">
+    <div>
+      <div class="feat-kicker">Feature 02 — Machine Learning</div>
+      <h2 class="feat-title">Patterns,<br><em>learned</em></h2>
+      <p class="feat-deck">From a messy dataset to a model that generalises — the unglamorous, satisfying craft of making a prediction worth believing.</p>
+    </div>
+  </div>
+  <div class="feat-body">
+    <div class="feat-cols">
+      <div class="feat-block"><h4>The problem</h4><p>A dataset hides a signal somewhere under the noise, the leakage and the imbalance. The task is to surface it without lying to yourself in the process.</p></div>
+      <div class="feat-block"><h4>Approach &amp; process</h4><p>Exploratory analysis first, then features built with intent, models compared on a clean validation split, and the result interrogated for where — and why — it breaks.</p></div>
+      <div class="feat-block"><h4>Stack</h4>
+        <div class="stack"><span class="chip">Python</span><span class="chip">scikit-learn</span><span class="chip">Pandas</span><span class="chip">Matplotlib</span></div>
+      </div>
+      <div class="feat-block"><h4>Outcome</h4><p>A reproducible notebook that explains itself — the kind of artifact a reviewer can trust and a future-me can extend.</p></div>
+    </div>
+    <figure class="feat-fig">
+      <div class="photo-slot"></div>
+      <figcaption>Fig. 2 — learning curve / confusion matrix. Drop a chart here.</figcaption>
+    </figure>
+  </div>
+  <div class="feat-foot">
+    <span class="feat-lesson">Lesson — a beautiful score on the train set is a warning, not a win.</span>
+    <a class="ghlink" href="https://github.com/juriai7?tab=repositories" target="_blank" rel="noopener">Read the code on GitHub →</a>
+  </div>
+</article>
+
+<!-- FEATURE 3 -->
+<article class="spread feature reveal" id="feat-3">
+  <div class="feat-top">
+    <div>
+      <div class="feat-kicker">Feature 03 — Robotics</div>
+      <h2 class="feat-title">Bodies that<br><em>decide</em></h2>
+      <p class="feat-deck">Where perception meets motion. A system that doesn't just understand a scene — it does something about it.</p>
+    </div>
+  </div>
+  <div class="feat-body">
+    <figure class="feat-fig">
+      <div class="photo-slot"></div>
+      <figcaption>Fig. 3 — robot / sensor rig in action. Drop a build photo here.</figcaption>
+    </figure>
+    <div class="feat-cols">
+      <div class="feat-block"><h4>The problem</h4><p>Software that's right on a screen still has to survive contact with the physical world — latency, sensors that lie, and a body with real consequences.</p></div>
+      <div class="feat-block"><h4>Approach &amp; process</h4><p>Sense, plan, act — wired together and debugged against reality. The interesting failures only appear once the wheels actually turn.</p></div>
+      <div class="feat-block"><h4>Stack</h4>
+        <div class="stack"><span class="chip">Python</span><span class="chip">ROS</span><span class="chip">Sensors</span><span class="chip">Control</span></div>
+      </div>
+      <div class="feat-block"><h4>Outcome</h4><p>A loop that closes — perception informing action in the real world, not just in simulation.</p></div>
+    </div>
+  </div>
+  <div class="feat-foot">
+    <span class="feat-lesson">Lesson — the real world is the only test set that doesn't flatter you.</span>
+    <a class="ghlink" href="https://github.com/juriai7?tab=repositories" target="_blank" rel="noopener">Read the code on GitHub →</a>
+  </div>
+</article>
+
+<!-- FEATURE 4 -->
+<article class="spread feature reveal" id="feat-4">
+  <div class="feat-top">
+    <div>
+      <div class="feat-kicker">Feature 04 — Engineering</div>
+      <h2 class="feat-title">The software<br><em>underneath</em></h2>
+      <p class="feat-deck">The applications, tools and tidy repositories that carry the intelligence — because a model nobody can run isn't finished.</p>
+    </div>
+  </div>
+  <div class="feat-body">
+    <div class="feat-cols">
+      <div class="feat-block"><h4>The problem</h4><p>Research code rots. The work of turning an experiment into something usable, readable and shippable is its own discipline.</p></div>
+      <div class="feat-block"><h4>Approach &amp; process</h4><p>Clear structure, real READMEs, sensible naming and the small acts of care that make a stranger able to use what you built.</p></div>
+      <div class="feat-block"><h4>Stack</h4>
+        <div class="stack"><span class="chip">Python</span><span class="chip">Git</span><span class="chip">APIs</span><span class="chip">Docs</span></div>
+      </div>
+      <div class="feat-block"><h4>Outcome</h4><p>A GitHub profile that reads like a portfolio, not a graveyard — projects you can clone and actually run.</p></div>
+    </div>
+    <figure class="feat-fig">
+      <div class="photo-slot"></div>
+      <figcaption>Fig. 4 — repo / interface screenshot. Drop a UI frame here.</figcaption>
+    </figure>
+  </div>
+  <div class="feat-foot">
+    <span class="feat-lesson">Lesson — documentation is a love letter to the next engineer (often me).</span>
+    <a class="ghlink" href="https://github.com/juriai7?tab=repositories" target="_blank" rel="noopener">Read the code on GitHub →</a>
+  </div>
+</article>
+
+<!-- ===== SKILLS / THE INDEX ===== -->
+<section class="spread" id="skills">
+  <div class="sec-head reveal">
+    <div class="title">
+      <span class="script">the index of</span>
+      <span class="word">Skills</span>
+    </div>
+    <span class="sec-no">04</span>
+  </div>
+
+  <div class="skills-grid reveal d1">
+    <div class="skill-cell">
+      <span class="sc-no">i.</span>
+      <ul class="sc-list"><li>Image classification</li><li>Object detection</li><li>OpenCV pipelines</li><li>Image processing</li></ul>
+      <span class="sc-cat">Computer<br>Vision</span>
+    </div>
+    <div class="skill-cell">
+      <span class="sc-no">ii.</span>
+      <ul class="sc-list"><li>Neural networks</li><li>CNNs</li><li>Training &amp; tuning</li><li>Evaluation</li></ul>
+      <span class="sc-cat">Deep<br>Learning</span>
+    </div>
+    <div class="skill-cell">
+      <span class="sc-no">iii.</span>
+      <ul class="sc-list"><li>Supervised models</li><li>Feature design</li><li>Data analysis</li><li>scikit-learn</li></ul>
+      <span class="sc-cat">Machine<br>Learning</span>
+    </div>
+    <div class="skill-cell">
+      <span class="sc-no">iv.</span>
+      <ul class="sc-list"><li>Sense–plan–act</li><li>ROS basics</li><li>Sensors &amp; control</li><li>Real-world AI</li></ul>
+      <span class="sc-cat">Robotics</span>
+    </div>
+    <div class="skill-cell">
+      <span class="sc-no">v.</span>
+      <ul class="sc-list"><li>Python</li><li>NumPy · Pandas</li><li>PyTorch</li><li>Matplotlib</li></ul>
+      <span class="sc-cat">Tooling</span>
+    </div>
+    <div class="skill-cell">
+      <span class="sc-no">vi.</span>
+      <ul class="sc-list"><li>Git &amp; GitHub</li><li>Clean READMEs</li><li>Reproducibility</li><li>Documentation</li></ul>
+      <span class="sc-cat">Craft</span>
+    </div>
+    <div class="skill-cell">
+      <span class="sc-no">vii.</span>
+      <ul class="sc-list"><li>Problem framing</li><li>Storytelling</li><li>Visual design</li><li>Branding</li></ul>
+      <span class="sc-cat">Creative<br>Direction</span>
+    </div>
+    <div class="skill-cell">
+      <span class="sc-no">viii.</span>
+      <ul class="sc-list"><li>Arabic — native</li><li>English — fluent</li><li>Curiosity — chronic</li><li>Taste — non-negotiable</li></ul>
+      <span class="sc-cat">Human</span>
+    </div>
+  </div>
+  <p class="marg-note reveal d2" style="margin-top:20px;">edit each cell to match your real stack — hover to invert ✦</p>
+</section>
+
+<hr class="rule">
+
+<!-- ===== ACHIEVEMENTS / CLIPPINGS ===== -->
+<section class="spread" id="awards">
+  <div class="sec-head reveal">
+    <div class="title">
+      <span class="script">collected</span>
+      <span class="word">Accolades</span>
+    </div>
+    <span class="sec-no">05</span>
+  </div>
+
+  <div class="clips reveal d1">
+    <div class="clip"><span class="tape"></span><span class="c-year">2026 — present</span><h3>AI Student, University of Prince Mugrin</h3><p>Studying Artificial Intelligence with a focus on computer vision, machine learning and robotics — turning coursework into real, owned projects.</p></div>
+    <div class="clip"><span class="tape"></span><span class="c-year">Ongoing</span><h3>Building in the open</h3><p>A public GitHub of perception, ML and robotics work — written to be read, cloned and run, not just starred.</p></div>
+    <div class="clip"><span class="tape"></span><span class="c-year">Add yours</span><h3>Hackathon / program</h3><p>A line for the next win — a competition, scholarship, or program. Replace this clipping when it happens.</p></div>
+    <div class="clip"><span class="tape"></span><span class="c-year">Add yours</span><h3>Recognition</h3><p>Space reserved for an award, feature or certification. Keep this section alive as the issues stack up.</p></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ===== CURRENTLY EXPLORING ===== -->
+<section class="spread" id="exploring">
+  <div class="sec-head reveal">
+    <div class="title">
+      <span class="script">coming next issue</span>
+      <span class="word">On the Radar</span>
+    </div>
+    <span class="sec-no">06</span>
+  </div>
+  <div class="radar reveal d1">
+    <span class="r-item">Vision transformers<span class="r-tag">reading</span></span>
+    <span class="r-item">Multimodal models<span class="r-tag">curious</span></span>
+    <span class="r-item">Reinforcement learning<span class="r-tag">tinkering</span></span>
+    <span class="r-item">Robotic perception<span class="r-tag">building</span></span>
+    <span class="r-item">Generative AI<span class="r-tag">watching</span></span>
+    <span class="r-item">Edge deployment<span class="r-tag">next</span></span>
+  </div>
+</section>
+
+<!-- ===== CONTACT / WRAP ===== -->
+<section class="wrap" id="contact">
+  <div class="spread">
+    <div class="reveal">
+      <p class="eyebrow">№07 — Closing</p>
+      <h2 class="wrap-title">and that's<br>a <em>wrap.</em></h2>
+      <p class="wrap-sub">Until the next idea becomes reality. If you'd like to build something intelligent — and beautiful — let's talk.</p>
+    </div>
+
+    <div class="wrap-links reveal d1">
+      <a href="https://github.com/juriai7" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:hello@example.com">Email</a>
+      <a href="https://www.linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+
+    <div class="colophon reveal d2">
+      <span>Juri Almarwani · The Intelligence Issue</span>
+      <span>Computer Vision · ML · Robotics</span>
+      <span>Set in Playfair, Cormorant, Pinyon &amp; Inter</span>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  // load animations
+  window.addEventListener('load',function(){document.body.classList.add('loaded');});
+
+  // custom cursor
+  var cur=document.getElementById('cur'),dot=document.getElementById('curDot');
+  var cx=window.innerWidth/2,cy=window.innerHeight/2,dx=cx,dy=cy;
+  var fine=window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  if(fine){
+    document.addEventListener('mousemove',function(e){
+      cx=e.clientX;cy=e.clientY;
+      cur.style.transform='translate('+cx+'px,'+cy+'px)';
+    });
+    (function loop(){
+      dx+=(cx-dx)*0.18;dy+=(cy-dy)*0.18;
+      dot.style.transform='translate('+dx+'px,'+dy+'px)';
+      requestAnimationFrame(loop);
+    })();
+    var hov='a,.toc-row,.skill-cell,.epoch,.r-item,.clip,.ghlink';
+    document.querySelectorAll(hov).forEach(function(el){
+      el.addEventListener('mouseenter',function(){cur.classList.add('grow');});
+      el.addEventListener('mouseleave',function(){cur.classList.remove('grow');});
+    });
+  }
+
+  // scroll reveal
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);} });
+  },{threshold:0.12,rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+
+  // hide folio on scroll down, show on up
+  var folio=document.getElementById('folio'),last=0;
+  window.addEventListener('scroll',function(){
+    var y=window.pageYOffset;
+    if(y>last && y>240){folio.classList.add('up');}else{folio.classList.remove('up');}
+    last=y;
+    // parallax discs
+    document.querySelectorAll('.cover .disc').forEach(function(d,i){
+      d.style.transform='translateY('+(y*(0.06+i*0.04))+'px)';
+    });
+  },{passive:true});
+})();
+</script>
+</body>
+</html>
